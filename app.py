@@ -2,7 +2,7 @@ from sqlalchemy import create_engine, Column, Integer, String
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 
-from flask import Flask
+from flask import Flask, render_template, jsonify, request
 
 Base = declarative_base()
 engine = create_engine("mysql+mysqldb://root@localhost:3306/pillbox")
@@ -62,6 +62,14 @@ class Pill(Base):
         return "<Pill Shape: %s Color: %s Name: %s>" % \
             (self.colors(), self.shape(), self.name())
 
+    @property
+    def serialize(self):
+        return {
+            "name": self.name(),
+            "colors": self.colors(),
+            "shape": self.shape()
+        }
+
     def colors(self):
         try:
             return [self.PILL_COLORS[x] for x in self.SPLCOLOR.split(";")]
@@ -78,10 +86,24 @@ class Pill(Base):
         except KeyError:
             return ""
 
+    @classmethod
+    def search_by_name(self, q):
+        pills = session.query(Pill).filter(Pill.MEDICINE_NAME.like("%" + q + "%"))
+        return pills.order_by(Pill.id)[0:10]
+
+
 app = Flask(__name__)
 @app.route("/")
 def index():
-    return "Hello there..."
+    return render_template("index.html")
+
+@app.route("/search/<query>")
+def search(query):
+    if request.args.get("representation") == "json":
+        return jsonify(json_list=[p.serialize for p in Pill.search_by_name(query)])
+    else:
+        return render_template("pill-list.html", pills=Pill.search_by_name(query))
+
 
 if __name__ == "__main__":
-    app.run()
+    app.run(debug=True)
