@@ -1,5 +1,8 @@
 <ul id="pill-list">
   {% for pill in pills %}
-    <li>{{ pill.name() }}</li>
+    <li>
+      <strong>{{ pill.name() }}</strong>
+      <em>{{ pill.colors() }} {{ pill.shape() }}</em>
+    </li>
   {% endfor %}
 </ul>

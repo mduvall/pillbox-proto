@@ -1,21 +1,32 @@
 function initApp() {
-  var inputEl = document.querySelector("#search-field");
+  var inputEl = document.querySelector("#search-field"),
+      sending = false,
+      keyupTimeout;
 
   inputEl.addEventListener("keyup", function(e) {
-    var val = e.target.value,
-        req = new XMLHttpRequest();
+    if (!keyupTimeout) {
+      keyupTimeout = setTimeout(function() {
+        var val = e.target.value,
+            req = new XMLHttpRequest();
 
-    req.open("GET", "/search/" + val, true);
-    req.onreadystatechange = function() {
-      var jsonRes;
+        if (val !== "") {
+          req.open("GET", "/search/" + val, true);
+          req.onreadystatechange = function() {
+            keyupTimeout = null;
+            if (req.readyState !== 4 || req.status !== 200) {
+              return;
+            }
 
-      if (req.readyState !== 4 || req.status !== 200) {
-        return;
-      }
+            var pillContainerEl = document.querySelector("#pills-container");
+            pillContainerEl.innerHTML = req.responseText;
+          };
+          req.send();
+        } else {
+          keyupTimeout = null;
+        }
+      }, 100);
+    }
 
-      document.querySelector("#pills-container").innerHTML = req.responseText;
-    };
-    req.send();
   });
 }
 

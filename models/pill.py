@@ -27,7 +27,7 @@ class Pill(Base):
 
     def colors(self):
         try:
-            return [self.PILL_COLORS[x] for x in self.SPLCOLOR.split(";")]
+            return "/".join([self.PILL_COLORS[x] for x in self.SPLCOLOR.split(";")])
         except KeyError:
             # Lots of dirty data (iee SPLCOLOR;SPLCOLOR,SPLCOLOR;;,;;SPLCOLOR)
             return [""]

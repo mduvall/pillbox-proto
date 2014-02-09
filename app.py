@@ -13,6 +13,5 @@ def search(query):
     else:
         return render_template("pill-list.html", pills=Pill.search_by_name(query))
 
-
 if __name__ == "__main__":
     app.run(debug=True)
