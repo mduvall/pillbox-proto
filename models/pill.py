@@ -33,7 +33,8 @@ class Pill(Base):
             return [""]
 
     def name(self):
-        return self.MEDICINE_NAME
+        capitalized_pill = [w.capitalize() for w in self.MEDICINE_NAME.split(" ")]
+        return " ".join(str(w) for w in capitalized_pill)
 
     def shape(self):
         try:
